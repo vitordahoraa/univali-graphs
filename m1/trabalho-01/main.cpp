@@ -1,5 +1,4 @@
 #include <iostream>
-
 using namespace std;
 
 void clear_screen()
@@ -87,12 +86,49 @@ void print_adjacent_matrix(int** matrix, int vertices_count)
     }
 }
 
+void print_main_menu()
+{
+    cout << "Escolha uma opção: \n";
+    cout << "[ 1 ] Incluir vertice \n";
+    cout << "[ 2 ] Incluir aresta/arco \n";
+    cout << "[ 3 ] Remover vertice \n";
+    cout << "[ 4 ] Remover aresta/arco \n";
+}
+
+bool validate_selected_menu_option(char option)
+    {
+        return
+            option == '1'
+            || option == '2'
+            || option == '3'
+            || option == '4'
+            || option == 'q';
+    }
+
+char get_valid_menu_option()
+{
+    char selected_option;
+    bool is_valid_option;
+
+    do {
+        cout << "~ ";
+        cin >> selected_option;
+
+        selected_option = tolower(selected_option);
+
+        is_valid_option = validate_selected_menu_option(selected_option);
+        if(!is_valid_option) cout << "[!] Opcao invalida\n\n";
+    } while (!is_valid_option);
+
+    return selected_option;
+}
+
 int main()
 {
     bool is_directed_graph;
     int vertices_count;
     int** adj_mat;
-    char menu_option = 'q';
+    char selected_menu_option;
 
     is_directed_graph = get_graph_type() == "directed";
     vertices_count = get_vertices_count();
@@ -102,9 +138,14 @@ int main()
     do
     {
         clear_screen();
+
         print_adjacent_matrix(adj_mat, vertices_count);
+        cout << "\n\n";
+
+        print_main_menu();
+        selected_menu_option = get_valid_menu_option();
     }
-    while (menu_option != 'q');
+    while (selected_menu_option != 'q');
 
 
 
