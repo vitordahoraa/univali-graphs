@@ -1,6 +1,9 @@
 #include <iostream>
 using namespace std;
 
+#include <string>
+#include <sstream>
+
 void clear_screen()
 {
 #ifdef WINDOWS
@@ -66,6 +69,16 @@ bool is_matrix_empty(int** matrix, int rows)
     return true;
 }
 
+void print_adjacent_matrix_row(int** matrix, int i, int vertices_count)
+{
+    printf("[ %d ] => ", i + 1);
+    for(int j = 0; j < vertices_count; j++)
+    {
+        if(is_adjacent_vertices(matrix, i, j))
+            printf("%d\t", j + 1);
+    }
+}
+
 void print_adjacent_matrix(int** matrix, int vertices_count)
 {
     if(is_matrix_empty(matrix, vertices_count))
@@ -76,12 +89,7 @@ void print_adjacent_matrix(int** matrix, int vertices_count)
 
     for(int i = 0; i < vertices_count; i++)
     {
-        printf("[ %d ] => ", i + 1);
-        for(int j = 0; j < vertices_count; j++)
-        {
-            if(is_adjacent_vertices(matrix, i, j))
-                printf("%d\t", j + 1);
-        }
+        print_adjacent_matrix_row(matrix, i, vertices_count);
         printf("\n");
     }
 }
@@ -96,21 +104,22 @@ void print_main_menu()
 }
 
 bool validate_selected_menu_option(char option)
-    {
-        return
-            option == '1'
-            || option == '2'
-            || option == '3'
-            || option == '4'
-            || option == 'q';
-    }
+{
+    return
+        option == '1'
+        || option == '2'
+        || option == '3'
+        || option == '4'
+        || option == 'q';
+}
 
 char get_valid_menu_option()
 {
     char selected_option;
     bool is_valid_option;
 
-    do {
+    do
+    {
         cout << "~ ";
         cin >> selected_option;
 
@@ -118,9 +127,53 @@ char get_valid_menu_option()
 
         is_valid_option = validate_selected_menu_option(selected_option);
         if(!is_valid_option) cout << "[!] Opcao invalida\n\n";
-    } while (!is_valid_option);
+    }
+    while (!is_valid_option);
 
     return selected_option;
+}
+
+void fill_adjacent_matrix_row(int** matrix, int i, string adjacent_vertices, int vertices_count)
+{
+    string adjacent_vertice_as_string;
+    int adjacent_vertice;
+
+    // adjacent_vertices is a string with the pattern "1 2 3", where each number represents one adjacent vertice of i
+    std::istringstream iss(adjacent_vertices);
+
+    while(iss >> adjacent_vertice_as_string)
+    {
+        adjacent_vertice = stoi(adjacent_vertice_as_string);
+
+        if (adjacent_vertice > vertices_count) continue;
+
+        matrix[i][adjacent_vertice - 1] = 1;
+    }
+}
+
+void fill_adjacent_matrix(int** matrix, int vertices_count)
+{
+    string adjacent_vertices;
+    string vertice;
+
+    for(int i = 0; i < vertices_count; i++)
+    {
+        // BUG: the adjacency list needs to begin with a whitespace
+        printf("Digite os vertices adjacentes ao vertice %d, separados por espacos (ex: 2 5 9)\n", i + 1);
+        printf("~ ");
+
+        std::cin.get();
+        std::getline(std::cin, adjacent_vertices);
+
+        cout << endl;
+
+        fill_adjacent_matrix_row(matrix, i, adjacent_vertices, vertices_count);
+    }
+}
+
+void add_graph_vertice(int** adjacent_matrix, int vertices_count)
+{
+
 }
 
 int main()
@@ -139,15 +192,23 @@ int main()
     {
         clear_screen();
 
+        fill_adjacent_matrix(adj_mat, vertices_count);
         print_adjacent_matrix(adj_mat, vertices_count);
+
         cout << "\n\n";
 
         print_main_menu();
         selected_menu_option = get_valid_menu_option();
+
+        switch(selected_menu_option)
+        {
+        case '1': // add one vertice
+            vertices_count++;
+            add_graph_vertice(adj_mat, vertices_count);
+            break;
+        }
     }
     while (selected_menu_option != 'q');
-
-
 
     return 0;
 }

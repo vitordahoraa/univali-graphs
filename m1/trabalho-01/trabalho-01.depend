@@ -1,4 +1,6 @@
 # depslib dependency file v1.0
-1647659564 source:/home/mpedroni/workspace/univali/graphs/m1/trabalho-01/main.cpp
+1647665439 source:/home/mpedroni/workspace/univali/graphs/m1/trabalho-01/main.cpp
 	<iostream>
+	<string>
+	<sstream>
 
