@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
-#include <vector>
 
+#include <vector>
 #include <string>
 #include <sstream>
 
@@ -198,7 +198,7 @@ int get_selected_vertice(string message)
     cout << "~ ";
     cin >> selected_vertice;
 
-    return selected_vertice;
+    return selected_vertice - 1;
 }
 
 void get_new_adjacency(AdjacencyMatrix &matrix)
@@ -206,7 +206,36 @@ void get_new_adjacency(AdjacencyMatrix &matrix)
     int vertice = get_selected_vertice("Em qual vertice voce deseja incluir uma aresta/arco?");
     int new_adjacency = get_selected_vertice("Qual vertice sera o novo vertice adjacente?");
 
-    matrix[vertice - 1][new_adjacency - 1] = 1;
+    matrix[vertice][new_adjacency] = 1;
+}
+
+void print_matrix(AdjacencyMatrix m)
+{
+    printf("\n\n");
+    for(int i = 0; i < m.size(); i++)
+    {
+        for(int j = 0; j < m[i].size(); j++)
+        {
+            printf("%d\t", m[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void remove_graph_vertice(AdjacencyMatrix &matrix, int vertice_to_remove)
+{
+    print_matrix(matrix);
+    if (vertice_to_remove >= matrix.size()) return;
+
+    matrix.erase(matrix.begin() + vertice_to_remove);
+
+    for(int i = 0; i != matrix.size(); i++)
+    {
+        matrix[i].erase(matrix[i].begin() + vertice_to_remove);
+    }
+
+    print_matrix(matrix);
 }
 
 int main()
@@ -248,6 +277,12 @@ int main()
             cout << "\n\n";
             get_new_adjacency(adj_mat);
             clear_screen();
+            break;
+
+        case '3': // remove vertice
+            cout << "\n\n";
+            remove_graph_vertice(adj_mat, get_selected_vertice("Qual vertice voce deseja remover?"));
+//            clear_screen();
             break;
 
         case 'q':
