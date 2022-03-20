@@ -191,6 +191,24 @@ void add_graph_vertice(AdjacencyMatrix &matrix)
     set_graph_vertice(matrix, vertices_count, vertice_adjacency_list);
 }
 
+int get_selected_vertice(string message)
+{
+    int selected_vertice;
+    cout << message << endl;
+    cout << "~ ";
+    cin >> selected_vertice;
+
+    return selected_vertice;
+}
+
+void get_new_adjacency(AdjacencyMatrix &matrix)
+{
+    int vertice = get_selected_vertice("Em qual vertice voce deseja incluir uma aresta/arco?");
+    int new_adjacency = get_selected_vertice("Qual vertice sera o novo vertice adjacente?");
+
+    matrix[vertice - 1][new_adjacency - 1] = 1;
+}
+
 int main()
 {
     bool is_directed_graph;
@@ -226,9 +244,15 @@ int main()
             clear_screen();
             break;
 
+        case '2': // add new edge/arc
+            cout << "\n\n";
+            get_new_adjacency(adj_mat);
+            clear_screen();
+            break;
+
         case 'q':
 
-        break;
+            break;
 
         default:
             printf("\n[!] Opcao invalida\n\n");
