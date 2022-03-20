@@ -4,6 +4,7 @@ using namespace std;
 #include <vector>
 #include <string>
 #include <sstream>
+#include <stack>
 
 typedef vector<vector<int>> AdjacencyMatrix;
 
@@ -82,20 +83,28 @@ void print_adjacent_matrix(AdjacencyMatrix matrix)
 void print_main_menu()
 {
     cout << "Escolha uma opção:";
-    cout << "\n[ 1 ] Incluir vertice";
-    cout << "\n[ 2 ] Incluir aresta/arco";
-    cout << "\n[ 3 ] Remover vertice";
-    cout << "\n[ 4 ] Remover aresta/arco";
+    cout << "\n[ a ] Incluir vertice";
+    cout << "\n[ b ] Incluir aresta/arco";
+    cout << "\n[ c ] Remover vertice";
+    cout << "\n[ d ] Remover aresta/arco";
+
+    cout << "\n\n[ l ] Realizar busca por largura";
+    cout << "\n[ p ] Realizar busca por profundidade";
+
     cout << "\n\n[ q ] Sair";
 }
 
 bool validate_selected_menu_option(char option)
 {
     return
-        option == '1'
-        || option == '2'
-        || option == '3'
-        || option == '4'
+        option == 'a'
+        || option == 'b'
+        || option == 'c'
+        || option == 'd'
+
+        || option == 'l'
+        || option == 'p'
+
         || option == 'q';
 }
 
@@ -231,6 +240,80 @@ void remove_vertice_adjacency(AdjacencyMatrix &matrix)
     matrix[vertice][adjacency] = 0;
 }
 
+bool has_unvisited_vertices(vector<bool> vertices)
+{
+    for(bool visited_vertice : vertices)
+        if (!visited_vertice) return true;
+
+    return false;
+}
+
+int get_next_unvisited_adjacent_vertice(vector<int> vertice, vector<bool> visited_vertices)
+{
+    for(int i = 0; i < vertice.size(); i++)
+        if(vertice[i] == 1 && !visited_vertices[i]) return i;
+
+    return -1;
+}
+
+int get_next_unvisited_vertice(vector<bool> visited_vertices)
+{
+    for(int i = 0; i < visited_vertices.size(); i++)
+        if(!visited_vertices[i]) return i;
+
+    return -1;
+}
+
+vector<int> graph_depth_first_search(AdjacencyMatrix matrix, char search_type)
+{
+    vector<bool> visited_vertices(matrix.size(), false);
+    vector<int> visiting_order;
+    stack<int> vertices_stack;
+    int searched_vertice = -1;
+
+    if(search_type == 'v')
+        searched_vertice = get_selected_vertice("Qual vertice voce procura?");
+
+    int root = get_selected_vertice("Qual deve ser o vertice root da busca?");
+
+    while(has_unvisited_vertices(visited_vertices))
+    {
+        // has no more adjacent vertices
+        if (root == -1)
+        {
+            vertices_stack.pop();
+            root = vertices_stack.empty() ? get_next_unvisited_vertice(visited_vertices) : vertices_stack.top();
+            root = get_next_unvisited_adjacent_vertice(matrix[root], visited_vertices);
+            continue;
+        }
+
+        visited_vertices[root] = true;
+        visiting_order.push_back(root);
+        vertices_stack.push(root);
+
+        if(root == searched_vertice)
+        {
+            return visiting_order;
+        }
+
+        root = get_next_unvisited_adjacent_vertice(matrix[root], visited_vertices);
+    }
+
+    cout << "\n\n nao achei essa desgraça \n\n";
+
+    return visiting_order;
+}
+
+char get_search_type()
+{
+    char search_type;
+    cout << "Digite \"v\" para buscar um vertice especifico ou \"a\" para ver todos os vertices na ordem de visitacao";
+    cout << "\n\~ ";
+    cin >> search_type;
+
+    return search_type;
+}
+
 int main()
 {
     bool is_directed_graph;
@@ -246,6 +329,7 @@ int main()
 
     get_graph_initial_state(adj_mat);
 
+
     clear_screen();
 
     do
@@ -259,36 +343,51 @@ int main()
 
         switch(selected_menu_option)
         {
-        case '1': // add one vertice
+        case 'a': // add one vertice
             cout << "\n\n";
             vertices_count++;
             add_graph_vertice(adj_mat);
             clear_screen();
             break;
 
-        case '2': // add new edge/arc
+        case 'b': // add new edge/arc
             cout << "\n\n";
             get_new_adjacency(adj_mat);
             clear_screen();
             break;
 
-        case '3': // remove vertice
+        case 'c': // remove vertice
             cout << "\n\n";
             remove_graph_vertice(adj_mat, get_selected_vertice("Qual vertice voce deseja remover?"));
             clear_screen();
             break;
 
-        case '4': // remove edge/arc
+        case 'd': // remove edge/arc
             cout << "\n\n";
             remove_vertice_adjacency(adj_mat);
             clear_screen();
             break;
+        case 'p': // search by depth
+        {
+            cout << "\n\n";
+            vector<int> visiting_order;
+            visiting_order = graph_depth_first_search(adj_mat, get_search_type());
+            cout << "[\t";
+            for(int i = 0; i < visiting_order.size(); i++)
+            {
+                printf("%d\t", visiting_order[i] + 1);
+            }
+
+            cout << "\t]\n\n";
+            break;
+        }
 
         case 'q':
 
             break;
 
         default:
+            cout << "\n\n\n" << selected_menu_option << "\n\n\n";
             printf("\n[!] Opcao invalida\n\n");
             continue;
         }
