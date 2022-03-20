@@ -1,8 +1,11 @@
 #include <iostream>
 using namespace std;
+#include <vector>
 
 #include <string>
 #include <sstream>
+
+typedef vector<vector<int>> AdjacencyMatrix;
 
 void clear_screen()
 {
@@ -43,19 +46,7 @@ void clear_matrix(int** matrix, int rows)
             matrix[i][j] = 0;
 }
 
-int** create_empty_matrix(int vertices_count)
-{
-    int** matrix = new int*[vertices_count];
-
-    for (int i = 0; i < vertices_count; ++i)
-        matrix[i] = new int[vertices_count];
-
-    clear_matrix(matrix, vertices_count);
-
-    return matrix;
-}
-
-bool is_adjacent_vertices(int** matrix, int i, int j)
+bool is_adjacent_vertices(AdjacencyMatrix matrix, int i, int j)
 {
     return matrix[i][j] == 1;
 }
@@ -69,27 +60,21 @@ bool is_matrix_empty(int** matrix, int rows)
     return true;
 }
 
-void print_adjacent_matrix_row(int** matrix, int i, int vertices_count)
+void print_adjacent_matrix_row(AdjacencyMatrix matrix, int i)
 {
     printf("[ %d ] => ", i + 1);
-    for(int j = 0; j < vertices_count; j++)
+    for(int j = 0; j < matrix.size(); j++)
     {
         if(is_adjacent_vertices(matrix, i, j))
             printf("%d\t", j + 1);
     }
 }
 
-void print_adjacent_matrix(int** matrix, int vertices_count)
+void print_adjacent_matrix(AdjacencyMatrix matrix)
 {
-    if(is_matrix_empty(matrix, vertices_count))
+    for(int i = 0; i < matrix.size(); i++)
     {
-        cout << "[!] Sua matriz esta vazia";
-        return;
-    }
-
-    for(int i = 0; i < vertices_count; i++)
-    {
-        print_adjacent_matrix_row(matrix, i, vertices_count);
+        print_adjacent_matrix_row(matrix, i);
         printf("\n");
     }
 }
@@ -133,10 +118,26 @@ char get_valid_menu_option()
     return selected_option;
 }
 
-void fill_adjacent_matrix_row(int** matrix, int i, string adjacent_vertices, int vertices_count)
+void set_graph_vertice(AdjacencyMatrix &matrix, int vertice, vector<int> adjacency_list)
 {
+    for(int i = 0; i < adjacency_list.size(); i++)
+        matrix[vertice][adjacency_list[i] - 1] = 1;
+
+}
+
+vector<int> get_vertice_adjacency_list(int vertice, int vertices_count) {
+    string adjacent_vertices;
     string adjacent_vertice_as_string;
     int adjacent_vertice;
+
+    vector<int> adjacency_list;
+
+    // BUG: the adjacency list needs to begin with a whitespace
+    printf("Digite os vertices adjacentes ao vertice %d, separados por espacos (ex: 2 5 9)\n", vertice + 1);
+    printf("~ ");
+
+    std::cin.get();
+    std::getline(std::cin, adjacent_vertices);
 
     // adjacent_vertices is a string with the pattern "1 2 3", where each number represents one adjacent vertice of i
     std::istringstream iss(adjacent_vertices);
@@ -147,31 +148,30 @@ void fill_adjacent_matrix_row(int** matrix, int i, string adjacent_vertices, int
 
         if (adjacent_vertice > vertices_count) continue;
 
-        matrix[i][adjacent_vertice - 1] = 1;
+        adjacency_list.push_back(adjacent_vertice);
     }
+
+    return adjacency_list;
 }
 
-void fill_adjacent_matrix(int** matrix, int vertices_count)
+void get_graph_initial_state(AdjacencyMatrix &matrix)
 {
     string adjacent_vertices;
     string vertice;
 
-    for(int i = 0; i < vertices_count; i++)
-    {
-        // BUG: the adjacency list needs to begin with a whitespace
-        printf("Digite os vertices adjacentes ao vertice %d, separados por espacos (ex: 2 5 9)\n", i + 1);
-        printf("~ ");
+    vector<int> vertice_adjacency_list;
 
-        std::cin.get();
-        std::getline(std::cin, adjacent_vertices);
+    for(int i = 0; i < matrix.size(); i++)
+    {
+        vertice_adjacency_list = get_vertice_adjacency_list(i, matrix.size());
 
         cout << endl;
 
-        fill_adjacent_matrix_row(matrix, i, adjacent_vertices, vertices_count);
+        set_graph_vertice(matrix, i, vertice_adjacency_list);
     }
 }
 
-void add_graph_vertice(int** adjacent_matrix, int vertices_count)
+void add_graph_vertice(AdjacencyMatrix &adjacent_matrix)
 {
 
 }
@@ -180,20 +180,23 @@ int main()
 {
     bool is_directed_graph;
     int vertices_count;
-    int** adj_mat;
     char selected_menu_option;
 
     is_directed_graph = get_graph_type() == "directed";
     vertices_count = get_vertices_count();
 
-    adj_mat = create_empty_matrix(vertices_count);
+    AdjacencyMatrix adj_mat(vertices_count, vector<int>(vertices_count, 0));
+
+    cout << "\n\n";
+
+    get_graph_initial_state(adj_mat);
 
     do
     {
         clear_screen();
 
-        fill_adjacent_matrix(adj_mat, vertices_count);
-        print_adjacent_matrix(adj_mat, vertices_count);
+        print_adjacent_matrix(adj_mat);
+        selected_menu_option = 'q';
 
         cout << "\n\n";
 
@@ -204,7 +207,7 @@ int main()
         {
         case '1': // add one vertice
             vertices_count++;
-            add_graph_vertice(adj_mat, vertices_count);
+            add_graph_vertice(adj_mat);
             break;
         }
     }
