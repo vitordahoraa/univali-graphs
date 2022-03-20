@@ -81,11 +81,12 @@ void print_adjacent_matrix(AdjacencyMatrix matrix)
 
 void print_main_menu()
 {
-    cout << "Escolha uma opção: \n";
-    cout << "[ 1 ] Incluir vertice \n";
-    cout << "[ 2 ] Incluir aresta/arco \n";
-    cout << "[ 3 ] Remover vertice \n";
-    cout << "[ 4 ] Remover aresta/arco \n";
+    cout << "Escolha uma opção:";
+    cout << "\n[ 1 ] Incluir vertice";
+    cout << "\n[ 2 ] Incluir aresta/arco";
+    cout << "\n[ 3 ] Remover vertice";
+    cout << "\n[ 4 ] Remover aresta/arco";
+    cout << "\n\n[ q ] Sair";
 }
 
 bool validate_selected_menu_option(char option)
@@ -105,7 +106,7 @@ char get_valid_menu_option()
 
     do
     {
-        cout << "~ ";
+        cout << "\n~ ";
         cin >> selected_option;
 
         selected_option = tolower(selected_option);
@@ -125,7 +126,8 @@ void set_graph_vertice(AdjacencyMatrix &matrix, int vertice, vector<int> adjacen
 
 }
 
-vector<int> get_vertice_adjacency_list(int vertice, int vertices_count) {
+vector<int> get_vertice_adjacency_list(int vertice, int vertices_count)
+{
     string adjacent_vertices;
     string adjacent_vertice_as_string;
     int adjacent_vertice;
@@ -171,9 +173,22 @@ void get_graph_initial_state(AdjacencyMatrix &matrix)
     }
 }
 
-void add_graph_vertice(AdjacencyMatrix &adjacent_matrix)
+void add_graph_vertice(AdjacencyMatrix &matrix)
 {
+    int vertices_count = matrix.size();
+    vector<int> empty_vertice(vertices_count + 1, 0);
+    vector<int> vertice_adjacency_list;
 
+    // include the new vertice in the existent vertices adjacency list
+    for(int i = 0; i < vertices_count; i++)
+    {
+        matrix[i].push_back(0);
+    }
+
+    matrix.push_back(empty_vertice);
+
+    vertice_adjacency_list = get_vertice_adjacency_list(vertices_count, vertices_count + 1);
+    set_graph_vertice(matrix, vertices_count, vertice_adjacency_list);
 }
 
 int main()
@@ -191,12 +206,11 @@ int main()
 
     get_graph_initial_state(adj_mat);
 
+    clear_screen();
+
     do
     {
-        clear_screen();
-
         print_adjacent_matrix(adj_mat);
-        selected_menu_option = 'q';
 
         cout << "\n\n";
 
@@ -206,12 +220,24 @@ int main()
         switch(selected_menu_option)
         {
         case '1': // add one vertice
+            cout << "\n\n";
             vertices_count++;
             add_graph_vertice(adj_mat);
+            clear_screen();
             break;
+
+        case 'q':
+
+        break;
+
+        default:
+            printf("\n[!] Opcao invalida\n\n");
+            continue;
         }
     }
     while (selected_menu_option != 'q');
+
+    cout << "o/";
 
     return 0;
 }
