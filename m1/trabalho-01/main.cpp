@@ -209,23 +209,8 @@ void get_new_adjacency(AdjacencyMatrix &matrix)
     matrix[vertice][new_adjacency] = 1;
 }
 
-void print_matrix(AdjacencyMatrix m)
-{
-    printf("\n\n");
-    for(int i = 0; i < m.size(); i++)
-    {
-        for(int j = 0; j < m[i].size(); j++)
-        {
-            printf("%d\t", m[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
 void remove_graph_vertice(AdjacencyMatrix &matrix, int vertice_to_remove)
 {
-    print_matrix(matrix);
     if (vertice_to_remove >= matrix.size()) return;
 
     matrix.erase(matrix.begin() + vertice_to_remove);
@@ -234,8 +219,16 @@ void remove_graph_vertice(AdjacencyMatrix &matrix, int vertice_to_remove)
     {
         matrix[i].erase(matrix[i].begin() + vertice_to_remove);
     }
+}
 
-    print_matrix(matrix);
+void remove_vertice_adjacency(AdjacencyMatrix &matrix)
+{
+    int vertice = get_selected_vertice("Voce deseja remover uma aresta/arco de qual vertice?");
+    int adjacency = get_selected_vertice("Com qual vertice?");
+
+    if (vertice >= matrix.size() || adjacency >= matrix.size()) return;
+
+    matrix[vertice][adjacency] = 0;
 }
 
 int main()
@@ -282,7 +275,13 @@ int main()
         case '3': // remove vertice
             cout << "\n\n";
             remove_graph_vertice(adj_mat, get_selected_vertice("Qual vertice voce deseja remover?"));
-//            clear_screen();
+            clear_screen();
+            break;
+
+        case '4': // remove edge/arc
+            cout << "\n\n";
+            remove_vertice_adjacency(adj_mat);
+            clear_screen();
             break;
 
         case 'q':
@@ -296,7 +295,7 @@ int main()
     }
     while (selected_menu_option != 'q');
 
-    cout << "o/";
+    cout << "\to/";
 
     return 0;
 }
