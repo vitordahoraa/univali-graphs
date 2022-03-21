@@ -5,6 +5,7 @@ using namespace std;
 #include <string>
 #include <sstream>
 #include <stack>
+#include <queue>
 
 typedef vector<vector<int>> AdjacencyMatrix;
 
@@ -304,6 +305,47 @@ vector<int> graph_depth_first_search(AdjacencyMatrix matrix, char search_type)
     return visiting_order;
 }
 
+vector<int> graph_depth_breadth_search(AdjacencyMatrix matrix, char search_type)
+{
+    vector<bool> visited_vertices(matrix.size(), false);
+    vector<int> visiting_order;
+    queue<int> vertices_queue;
+    int searched_vertice = -1;
+    int next_adjacent;
+
+    if(search_type == 'v')
+        searched_vertice = get_selected_vertice("Qual vertice voce procura?");
+
+    int root = get_selected_vertice("Qual deve ser o vertice root da busca?");
+
+
+    visited_vertices[root] = true;
+    visiting_order.push_back(root);
+
+    if (root == searched_vertice) return visiting_order;
+
+    while(has_unvisited_vertices(visited_vertices))
+    {
+        next_adjacent = get_next_unvisited_adjacent_vertice(matrix[root], visited_vertices);
+
+        while (next_adjacent != -1)
+        {
+            visiting_order.push_back(next_adjacent);
+
+            if (next_adjacent == searched_vertice) return visiting_order;
+
+            visited_vertices[next_adjacent] = true;
+            vertices_queue.push(next_adjacent);
+            next_adjacent = get_next_unvisited_adjacent_vertice(matrix[root], visited_vertices);
+        }
+
+        root = vertices_queue.empty() ? get_next_unvisited_vertice(visited_vertices) : vertices_queue.front();
+        vertices_queue.pop();
+    }
+
+    return visiting_order;
+}
+
 char get_search_type()
 {
     char search_type;
@@ -372,7 +414,22 @@ int main()
             cout << "\n\n";
             vector<int> visiting_order;
             visiting_order = graph_depth_first_search(adj_mat, get_search_type());
-            cout << "[\t";
+            cout << "Ordem de visitacao -> [\t";
+            for(int i = 0; i < visiting_order.size(); i++)
+            {
+                printf("%d\t", visiting_order[i] + 1);
+            }
+
+            cout << "\t]\n\n";
+            break;
+        }
+
+        case 'l': // search by breadth
+        {
+            cout << "\n\n";
+            vector<int> visiting_order;
+            visiting_order = graph_depth_breadth_search(adj_mat, get_search_type());
+            cout << "Ordem de visitacao -> [\t";
             for(int i = 0; i < visiting_order.size(); i++)
             {
                 printf("%d\t", visiting_order[i] + 1);
