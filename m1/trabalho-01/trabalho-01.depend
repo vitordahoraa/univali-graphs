@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1647820573 source:/home/mpedroni/workspace/univali/graphs/m1/trabalho-01/main.cpp
-	<iostream>
-	<vector>
-	<string>
-	<sstream>
-	<stack>
-	<queue>
-
